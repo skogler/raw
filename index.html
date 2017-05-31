@@ -35,6 +35,54 @@
   <link rel="icon" href="favicon.ico?v=2" type="image/x-icon">
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 
+<style>
+
+.node {
+  font: 300 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: 0.4;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}
+
+</style>
+
 </head>
 
 <body data-spy="scroll" data-target="#raw-nav">
@@ -103,7 +151,9 @@
   <script type="text/javascript" src="bower_components/d3-plugins/hexbin/hexbin.js"></script>
   <script type="text/javascript" src="bower_components/d3-plugins-density/horizon.js"></script>
   <script type="text/javascript" src="bower_components/d3-plugins/box/box.js"></script>
-  <script type="text/javascript" src="node_modules/d3-hierarchy/build/d3-hierarchy.min.js"></script>
+  <script type="text/javascript" src="node_modules/d3-shape/build/d3-shape.js"></script>
+  <script type="text/javascript" src="node_modules/d3-path/build/d3-path.js"></script>
+  <script type="text/javascript" src="node_modules/d3-hierarchy/build/d3-hierarchy.js"></script>
   <!-- codemirror -->
   <script type="text/javascript" src="bower_components/codemirror/lib/codemirror.js"></script>
   <script type="text/javascript" src="bower_components/codemirror/addon/display/placeholder.js"></script>
