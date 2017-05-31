@@ -2,7 +2,7 @@
   "name": "raw",
   "version": "1.2.0",
   "description": "The missing link between spreadsheet and data visualization",
-  "main": "index.html",
+  "main": "raw.js",
   "directories": {
     "lib": "lib"
   },
