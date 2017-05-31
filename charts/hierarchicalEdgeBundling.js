@@ -1,3 +1,13 @@
+'use strict';
+
+// import d3 'd3-hierarchy';
+// import * as d3 from 'd3-shape';
+
+import '../lib/raw.js';
+
+var d3h = require('d3-hierarchy');
+var d3s = require('d3-shape');
+
 (function(){
   var model = raw.models.tree();
 
@@ -25,13 +35,13 @@
   // data is not the original set of records
   // but the result of the model map function
   chart.draw(function (selection, data){
-    var root = d3.hierarchy(data);
+    var root = d3h.hierarchy(data);
 
     var diameter = width() * 0.8;
     var radius = diameter / 2;
     var innerRadius = radius - 120;
 
-    var cluster = d3.cluster()
+    var cluster = d3h.cluster()
       .size([360, innerRadius]);
 
     
@@ -39,8 +49,14 @@
       var links = [];
       node.eachBefore(function(node) {
         if (!node.children) {
-          var ancestors = node.ancestors()
-          links.push({source: ancestors[0], target: ancestors[ancestors.length - 1]});
+          var ancestors = node.ancestors();
+          var s = ancestors[0];
+          var i = ancestors.length;
+          while (--i > 1)
+          {
+            var d = ancestors[i];
+            links.push([[s.x, s.y], [d.x, d.y]]);
+          }
         }
       });
       return links;
@@ -48,10 +64,10 @@
 
     cluster(root);
 
-    var line = d3.lineRadial()
-      .curve(d3.curveBundle.beta(0.85))
-      .radius(function(d) { return d.y; })
-      .angle(function(d) { return d.x / 180 * Math.PI;  });
+    var lineFunction = d3s.line();
+      // .curve(d3s.curveBundle.beta(0.85))
+      // .radius(function(d) { return d.y; })
+      // .angle(function(d) { return d.x / 180 * Math.PI;  });
 
     var svg = selection
       .attr("width", width())
@@ -67,8 +83,9 @@
       .enter().append("path")
       .attr("class", "link")
       .attr("d", function(d) {
-        console.log(d);
-        console.log(line(d));
+        var res = lineFunction(d);
+        console.log(d, res);
+        return res;
       });
 
     node = node
@@ -78,7 +95,7 @@
       .attr("dy", "0.31em")
       .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
       .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      .text(function(d) { return d.data.name; })
+      .text(function(d) { return d.data.label ? d.data.label.join(", ") : d.data.name; })
       .on("mouseover", mouseovered)
       .on("mouseout", mouseouted);
 

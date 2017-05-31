@@ -2,19 +2,17 @@
   "name": "raw",
   "version": "1.2.0",
   "description": "The missing link between spreadsheet and data visualization",
-  "main": "raw.js",
+  "main": "index.js",
   "directories": {
     "lib": "lib"
   },
   "dependencies": {
-    "d3-hierarchy" : "1.1.4",
-    "d3-shape" : "1.2.0",
-    "d3": "3.5.*",
-    "d3-plugins": "*",
-    "d3-plugins-density": "latest"
+    "d3-hierarchy" : "1.1.*",
+    "d3-shape" : "1.2.*"
   },
   "devDependencies": {},
   "scripts": {
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
