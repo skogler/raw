@@ -61,8 +61,11 @@ var d3s = require('d3-shape');
     // create an edge to each nodes' parent
     var links = [];
     for (var i = 0, len = nodes.length; i < len; i++) {
-      if (nodes[i].parent != fakeRoot) {
-        links.push([[nodes[i].x, nodes[i].y],[nodes[i].parent.x, nodes[i].parent.y]]);
+      var n = nodes[i];
+      var p = n.parent;
+      while (p && p != fakeRoot) {
+        links.push([[n.x, n.y],[p.x, p.y]]);
+        p = p.parent;
       }
     }
 
