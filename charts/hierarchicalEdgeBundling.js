@@ -10,6 +10,9 @@ var d3s = require('d3-shape');
 
 (function(){
   var model = raw.models.tree();
+  model.dimensions().remove('size');
+  model.dimensions().remove('color');
+  model.dimensions().remove('label');
 
   var chart = raw.chart()
     .title("Hierarchical Edge Bundling")
@@ -23,79 +26,76 @@ var d3s = require('d3-shape');
 
   var height = chart.number()
     .title('Height')
-    .defaultValue(600);
+    .defaultValue(900);
 
   var margin = chart.number()
     .title('margin')
     .defaultValue(10);
-
 
   // Drawing function
   // selection represents the d3 selection (svg)
   // data is not the original set of records
   // but the result of the model map function
   chart.draw(function (selection, data){
+    var w = Math.max(0, width() || 0);
+    var h = Math.max(0, height() || 0);
+    var m = Math.max(0, margin() || 0);
+
     var root = d3h.hierarchy(data);
+    var fakeRoot = root.descendants()[0];
+    var nodes = root.descendants().slice(1);
 
-    var diameter = width() * 0.8;
+    // create circular layout
+    var minDim = Math.min(w, h);
+    var diameter = minDim - m;
     var radius = diameter / 2;
-    var innerRadius = radius - 120;
+    var innerRadius = Math.max(0, radius - 120);
+    var placementAngle = (2 * Math.PI) / (nodes.length);
 
-    var cluster = d3h.cluster()
-      .size([360, innerRadius]);
-
-    
-    function createHierarchicalLinks(node) {
-      var links = [];
-      node.eachBefore(function(node) {
-        if (!node.children) {
-          var ancestors = node.ancestors();
-          var s = ancestors[0];
-          var i = ancestors.length;
-          while (--i > 1)
-          {
-            var d = ancestors[i];
-            links.push([[s.x, s.y], [d.x, d.y]]);
-          }
-        }
-      });
-      return links;
+    for (var i = 0, len = nodes.length; i < len; i++) {
+      nodes[i].x = Math.cos(placementAngle * i) * innerRadius;
+      nodes[i].y = -Math.sin(placementAngle * i) * innerRadius;
+      nodes[i].angle = (placementAngle * i * 180) / Math.PI;
     }
 
-    cluster(root);
+    // create an edge to each nodes' parent
+    var links = [];
+    for (var i = 0, len = nodes.length; i < len; i++) {
+      if (nodes[i].parent != fakeRoot) {
+        links.push([[nodes[i].x, nodes[i].y],[nodes[i].parent.x, nodes[i].parent.y]]);
+      }
+    }
 
-    var lineFunction = d3s.line();
-      // .curve(d3s.curveBundle.beta(0.85))
-      // .radius(function(d) { return d.y; })
-      // .angle(function(d) { return d.x / 180 * Math.PI;  });
+    var lineFunction = d3s.line()
+      .curve(d3s.curveBundle.beta(0.85));
 
     var svg = selection
-      .attr("width", width())
-      .attr("height", height())
+      .attr("width", w)
+      .attr("height", h)
       .append("g")
-      .attr("transform", "translate(" + radius + "," + radius + ")");
+      .attr("transform", "translate(" + w/2 + "," + h/2 + ")");
 
     var link = svg.append("g").selectAll(".link");
     var node = svg.append("g").selectAll(".node");
 
     link = link
-      .data(createHierarchicalLinks(root))
+      .data(links)
       .enter().append("path")
       .attr("class", "link")
-      .attr("d", function(d) {
-        var res = lineFunction(d);
-        console.log(d, res);
-        return res;
-      });
+      .attr("d", lineFunction);
 
-    node = node
-      .data(root.leaves())
-      .enter().append("text")
+    var nodeGroups =  node
+      .data(nodes)
+      .enter().append("g")
+      .attr("transform", d => "translate(" + d.x + "," + d.y + ")rotate(-" + d.angle + ")" );
+
+    nodeGroups.append("circle").attr('r', '1');
+    nodeGroups.append("text")
       .attr("class", "node")
       .attr("dy", "0.31em")
-      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + (d.y + 8) + ",0)" + (d.x < 180 ? "" : "rotate(180)"); })
-      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      .text(function(d) { return d.data.label ? d.data.label.join(", ") : d.data.name; })
+      .attr("transform", d => "translate(5,0)rotate(" + ((d.angle > 90 && d.angle < 270) ? 180  : 0) + ")" )
+      .attr("text-anchor", d => ((d.angle > 90 && d.angle < 270) ? 180  : 0) ? "end" : "start")
+      .text(d => d.data.label ? d.data.label.join(", ") : d.data.name )
       .on("mouseover", mouseovered)
       .on("mouseout", mouseouted);
 
