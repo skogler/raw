@@ -63,10 +63,12 @@ var d3s = require('d3-shape');
     for (var i = 0, len = nodes.length; i < len; i++) {
       var n = nodes[i];
       var p = n.parent;
+      var currentLink = [[n.x, n.y]];
       while (p && p != fakeRoot) {
-        links.push([[n.x, n.y],[p.x, p.y]]);
+        currentLink.push([p.x, p.y]);
         p = p.parent;
       }
+      links.push(currentLink);
     }
 
     var lineFunction = d3s.line()
