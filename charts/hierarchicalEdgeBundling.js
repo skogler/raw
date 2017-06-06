@@ -157,15 +157,14 @@ import '../lib/raw.js';
     svgNodes = svg.append("g").selectAll(".node")
       .data(root.leaves())
       .enter().append("g")
-      .attr("transform", d => "rotate(" + (d.x - 90) + ")translate("+ (d.y + 8) + ")" );
+      .attr("transform", d => "rotate(" + (d.x - 90) + ")translate("+ (d.y + 6) + ")" );
 
     svgNodes.append("circle").attr('r', '1');
     svgNodes.append("text")
       .attr("class", "node")
-      .attr("dy", "0.31em")
-      .attr("transform", d => "translate(5,0)rotate(" + ((d.x < 180) ? 0 : 180) + ")" )
-      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-      // .text(d => d.x)
+      .attr("alignment-baseline", "middle")
+      .attr("transform", d => "translate(6,0)rotate(" + ((d.x <= 180) ? 0 : 180) + ")" )
+      .attr("text-anchor", d => (d.x <= 180) ? "start" : "end" )
       .text(d => d.data.label ? d.data.label.join(", ") : d.data.name )
       .on("mouseover", onNodeMouseOver)
       .on("mouseout", onNodeMouseOut);
