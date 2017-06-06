@@ -199,8 +199,9 @@ angular.module('raw.controllers', [])
       { title : 'Orchestras', type : 'Hierarchies (weighted)', url : 'data/orchestra.csv' },
       { title : 'Animal kingdom', type: 'Hierarchies', url : 'data/animals.tsv' },
       { title : 'Titanic\'s passengers', type : 'Multi categorical', url : 'data/titanic.tsv' },
-      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'}
-    ]
+      { title : 'Most frequent letters', type: 'Matrix (narrow)', url:'data/letters.tsv'},
+      { title : 'Flare software dependencies', type: 'Hierarchies+Graphs', url : 'data/flare.tsv' }
+    ];
 
     $scope.selectSample = function(sample) {
 //    $scope.$watch('sample', function (sample){
@@ -391,7 +392,7 @@ angular.module('raw.controllers', [])
 
         $timeout(function() {
           $scope.charts = raw.charts.values().sort(function (a,b){ return d3.ascending(a.category(),b.category()) || d3.ascending(a.title(),b.title()) })
-          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Scatter Plot'})[0];
+          $scope.chart = $scope.charts.filter(function(d){return d.title() == 'Hierarchical Edge Bundling'})[0];
           $scope.model = $scope.chart ? $scope.chart.model() : null;
         });
       } catch(e){
@@ -450,6 +451,7 @@ angular.module('raw.controllers', [])
       $('[data-spy="scroll"]').each(function () {
         $(this).scrollspy('refresh');
       });
+      $scope.selectSample($scope.samples[10]);
     }
 
     $(window).scroll(function(){
