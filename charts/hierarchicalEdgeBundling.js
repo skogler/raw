@@ -144,6 +144,52 @@ import '../lib/raw.js';
       .append("g")
       .attr("transform", "translate(" + w/2 + "," + h/2 + ")");
 
+    svg.append("style").text(`
+.node {
+  font: 300 11px \"Helvetica Neue", Helvetica, Arial, sans-serif;
+  fill: #bbb;
+}
+
+.node:hover {
+  fill: #000;
+}
+
+.link {
+  stroke: steelblue;
+  stroke-opacity: 0.4;
+  fill: none;
+  pointer-events: none;
+}
+
+.node:hover,
+.node--source,
+.node--target {
+  font-weight: 700;
+}
+
+.node--source {
+  fill: #2ca02c;
+}
+
+.node--target {
+  fill: #d62728;
+}
+
+.link--source,
+.link--target {
+  stroke-opacity: 1;
+  stroke-width: 2px;
+}
+
+.link--source {
+  stroke: #d62728;
+}
+
+.link--target {
+  stroke: #2ca02c;
+}`);
+
+
     svgLinks = svg.append("g").selectAll(".link")
       .data(data.links)
       .enter().append("path")
@@ -157,11 +203,12 @@ import '../lib/raw.js';
     svgNodes = svg.append("g").selectAll(".node")
       .data(root.leaves())
       .enter().append("g")
+      .attr("class", "node")
       .attr("transform", d => "rotate(" + (d.x - 90) + ")translate("+ (d.y + 6) + ")" );
+
 
     svgNodes.append("circle").attr('r', '1');
     svgNodes.append("text")
-      .attr("class", "node")
       .attr("alignment-baseline", "middle")
       .attr("transform", d => "translate(6,0)rotate(" + ((d.x <= 180) ? 0 : 180) + ")" )
       .attr("text-anchor", d => (d.x <= 180) ? "start" : "end" )
