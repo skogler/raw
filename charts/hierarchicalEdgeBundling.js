@@ -34,6 +34,7 @@ import '../lib/raw.js';
     .title("Hierarchical Edge Bundling")
     .description("Visualizes a hierarchy with adjacency information between leaves.")
     .category('Hierarchy+Graph')
+    .thumbnail("imgs/hierarchicalEdgeBundling.png")
     .model(model);
 
   var width = chart.number()
