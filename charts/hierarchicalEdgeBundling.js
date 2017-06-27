@@ -14,21 +14,24 @@ import '../lib/raw.js';
 
   var hierarchy = model.dimension('hierarchy')
     .title('Hierarchy')
-    .description("Will be split by '" + HIERARCHY_SEPARATOR + "' to build the hierarchy. The rightmost entries are the final node names.")
+    .description("Will be split by the configured hierarchy separator to build the hierarchy. The rightmost entries are the final node names.")
     .required(1)
+    .types(Number,String)
     .multiple(false);
 
   var links = model.dimension('links')
     .title('Links')
     .required(1)
     .multiple(true)
-    .description("List of identifiers of connected nodes. Must be the same format as the Hierarchy field");
+    .types(Number,String)
+    .description("List of identifiers of connected nodes. Will be split by the configured links separator to build a list of links for each node.");
 
   var size = model.dimension('size')
     .title('Size')
     .required(1)
     .multiple(false)
-    .description("Size of each node. Required for hierarchical layout.");
+    .types(Number)
+    .description("Size of each node. Required for weighting the hierarchical layout.");
 
   var chart = raw.chart()
     .title("Hierarchical Edge Bundling")
@@ -46,9 +49,20 @@ import '../lib/raw.js';
     .defaultValue(900);
 
   var margin = chart.number()
-    .title('margin')
+    .title('Margin')
     .defaultValue(10);
 
+  var link_separator = chart.string()
+    .title('Link Separator')
+    .defaultValue(LINK_SEPARATOR);
+
+  var hierarchy_separator = chart.string()
+    .title('Hierarchy Separator')
+    .defaultValue(HIERARCHY_SEPARATOR);
+
+  var opacity = chart.number()
+    .title('Link opacity')
+    .defaultValue(0.4);
 
   model.map(function (data) {
     var result = { hierarchy: null, links: null };
@@ -66,7 +80,7 @@ import '../lib/raw.js';
       }
       var name = id;
       var path = "";
-      var idx =  id.lastIndexOf(HIERARCHY_SEPARATOR);
+      var idx =  id.lastIndexOf(hierarchy_separator() || HIERARCHY_SEPARATOR);
       if (idx > -1) {
         path = id.substring(0, idx);
         name = id.substring(idx + 1);
@@ -96,7 +110,7 @@ import '../lib/raw.js';
       if (linksString)
       {
         linksString = linksString[0];
-        var linksArray = linksString.split(LINK_SEPARATOR);
+        var linksArray = linksString.split(link_separator() || LINK_SEPARATOR);
         linksArray.forEach(l => {
           var dstNode = nodeMap[l];
           if (dstNode)
@@ -157,7 +171,6 @@ import '../lib/raw.js';
 
 .link {
   stroke: steelblue;
-  stroke-opacity: 0.4;
   fill: none;
   pointer-events: none;
 }
@@ -199,6 +212,7 @@ import '../lib/raw.js';
         x.target = x[x.length - 1];
       })
       .attr("class", "link")
+      .attr("style", "stroke-opacity: " + opacity())
       .attr("d", lineFunction);
 
     svgNodes = svg.append("g").selectAll(".node")
