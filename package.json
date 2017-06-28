@@ -7,11 +7,13 @@
     "lib": "lib"
   },
   "dependencies": {
-    "d3-hierarchy" : "1.1.*",
-    "d3-shape" : "1.2.*"
+    "d3-hierarchy": "1.1.*",
+    "d3-shape": "1.2.*",
+    "http-server": "*"
   },
   "devDependencies": {},
   "scripts": {
+    "start": "npm run build && http-server -p 1337",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
