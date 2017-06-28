@@ -1,6 +1,4 @@
-
 import '../lib/raw.js';
-
 
 (function(){
   'use strict';
@@ -142,6 +140,10 @@ import '../lib/raw.js';
     var radius = diameter / 2;
     var innerRadius = Math.max(0, radius - 120);
 
+    var chartContainer = $('#chart');
+    chartContainer.width(w);
+    chartContainer.height(h);
+
     // hierarchically compute each cluster's size
     var root = data.hierarchy.sum(x => x.size);
     // create layout based on size
@@ -154,12 +156,8 @@ import '../lib/raw.js';
       .angle(x => x.x / 180 * Math.PI);
 
     var svg = selection
-      .attr("width", w)
-      .attr("height", h)
-      .append("g")
-      .attr("transform", "translate(" + w/2 + "," + h/2 + ")");
-
-    svg.append("style").text(`
+      .attr("viewBox",[-w/2, -h/2, w, h].join(","));
+      svg.append("style").text(`
 .node {
   font: 300 11px \"Helvetica Neue", Helvetica, Arial, sans-serif;
   fill: #bbb;
@@ -192,7 +190,7 @@ import '../lib/raw.js';
 .link--source,
 .link--target {
   stroke-opacity: 1;
-  stroke-width: 2px;
+  stroke-width: 2;
 }
 
 .link--source {
