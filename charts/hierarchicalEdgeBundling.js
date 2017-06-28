@@ -62,6 +62,10 @@ import '../lib/raw.js';
     .title('Link opacity')
     .defaultValue(0.4);
 
+  var strokeWidth = chart.number()
+    .title('Link stroke width')
+    .defaultValue(1);
+
   model.map(function (data) {
     var result = { hierarchy: null, links: null };
     if (!hierarchy() || !links() || !size()) {
@@ -126,6 +130,10 @@ import '../lib/raw.js';
 
   var svgNodes = "";
   var svgLinks = "";
+  var svgLinkHighlights = "";
+  var isFixated = false;
+  var fixatedNode;
+  var forceUpdate = false;
 
   // Drawing function
   // selection represents the d3 selection (svg)
@@ -156,24 +164,36 @@ import '../lib/raw.js';
       .angle(x => x.x / 180 * Math.PI);
 
     var svg = selection
-      .attr("viewBox",[-w/2, -h/2, w, h].join(","));
+      .attr("viewBox", [-w/2, -h/2, w, h].join(","));
       svg.append("style").text(`
 .node {
   font: 300 11px \"Helvetica Neue", Helvetica, Arial, sans-serif;
   fill: #bbb;
 }
 
-.node:hover {
+.node--hover {
   fill: #000;
 }
 
-.link {
+.link,
+.link-highlight 
+{
   stroke: steelblue;
   fill: none;
   pointer-events: none;
 }
 
-.node:hover,
+.link {
+  stroke-opacity: ${opacity()};
+  stroke-width: ${strokeWidth()};
+}
+
+.link-highlight .link {
+  stroke-opacity: 1;
+  stroke-width: ${strokeWidth() * 2};
+}
+
+.node--hover,
 .node--source,
 .node--target {
   font-weight: 700;
@@ -185,12 +205,6 @@ import '../lib/raw.js';
 
 .node--target {
   fill: #d62728;
-}
-
-.link--source,
-.link--target {
-  stroke-opacity: 1;
-  stroke-width: 2;
 }
 
 .link--source {
@@ -210,7 +224,6 @@ import '../lib/raw.js';
         x.target = x[x.length - 1];
       })
       .attr("class", "link")
-      .attr("style", "stroke-opacity: " + opacity())
       .attr("d", lineFunction);
 
     svgNodes = svg.append("g").selectAll(".node")
@@ -227,39 +240,61 @@ import '../lib/raw.js';
       .attr("text-anchor", d => (d.x <= 180) ? "start" : "end" )
       .text(d => d.data.label ? d.data.label.join(", ") : d.data.name )
       .on("mouseover", onNodeMouseOver)
-      .on("mouseout", onNodeMouseOut);
+      .on("mouseout", onNodeMouseOut)
+      .on("click", onNodeClick);
+    svgLinkHighlights = svg.append("g").attr('class', 'link-highlight').node();
 
   }); // end of draw
 
   function onNodeMouseOver(d) {
+    if (isFixated && !forceUpdate) {
+      return false;
+    }
     svgNodes.each(n => n.isSelectedTarget = n.isSelectedSource = false);
 
-    svgLinks.classed("link--target", l => {
+    svgLinks.each(function(l) {
       if (l.target === d) {
         l.source.isSelectedSource = true; 
-        return true;
-      }
-      return false;
-    });
-
-    svgLinks.classed("link--source", l => { 
-      if (l.source === d) {
+        let copy = this.cloneNode();
+        copy.setAttribute("class", "link link--source");
+        svgLinkHighlights.appendChild(copy);
+      } else if (l.source === d) {
         l.target.isSelectedTarget = true; 
-        return true;
+        let copy = this.cloneNode();
+        copy.setAttribute("class", "link link--target");
+        svgLinkHighlights.appendChild(copy);
       }
-      return false;
     });
 
     svgNodes.classed("node--target", n => n.isSelectedTarget)
-      .classed("node--source", n => n.isSelectedSource);
+      .classed("node--source", n => n.isSelectedSource)
+      .classed("node--hover", n => n === d);
   }
 
   function onNodeMouseOut(d) {
-    svgLinks.classed("link--target", false)
-      .classed("link--source", false);
+    if (!isFixated) {
+      while(svgLinkHighlights.lastChild) {
+        svgLinkHighlights.removeChild(svgLinkHighlights.lastChild);
+      }
+      // svgLinks.classed("link--target", false)
+      //   .classed("link--source", false);
 
-    svgNodes.classed("node--target", false)
-      .classed("node--source", false);
+      svgNodes.classed("node--target", false)
+        .classed("node--source", false)
+        .classed("node--hover", false);
+    }
   }
 
+  function onNodeClick(d) {
+    if (d === fixatedNode) {
+      fixatedNode = undefined;
+      isFixated = false;
+    } else {
+      isFixated = true;
+      fixatedNode = d;
+    }
+    forceUpdate = true;
+    onNodeMouseOver(d);
+    forceUpdate = false;
+  }
 })(); // end of chart
