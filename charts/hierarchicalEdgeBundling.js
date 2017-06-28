@@ -16,14 +16,14 @@ import '../lib/raw.js';
     .title('Hierarchy')
     .description("Will be split by the configured hierarchy separator to build the hierarchy. The rightmost entries are the final node names.")
     .required(1)
-    .types(Number,String)
+    .types(String)
     .multiple(false);
 
   var links = model.dimension('links')
     .title('Links')
     .required(1)
     .multiple(true)
-    .types(Number,String)
+    .types(String)
     .description("List of identifiers of connected nodes. Will be split by the configured links separator to build a list of links for each node.");
 
   var size = model.dimension('size')
