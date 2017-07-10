@@ -30,6 +30,7 @@ If you want to run your instance of RAW locally on your machine, be sure you hav
 - [git](http://git-scm.com/book/en/Getting-Started-Installing-Git)
 - [Bower](http://bower.io/#installing-bower)
 - [npm](https://www.npmjs.com/get-npm)
+- [webpack](https://webpack.js.org/guides/installation/)
 
 ### Instructions
 
