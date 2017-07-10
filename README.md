@@ -29,6 +29,7 @@ If you want to run your instance of RAW locally on your machine, be sure you hav
 
 - [git](http://git-scm.com/book/en/Getting-Started-Installing-Git)
 - [Bower](http://bower.io/#installing-bower)
+- [npm](https://www.npmjs.com/get-npm)
 
 ### Instructions
 
@@ -38,39 +39,34 @@ Clone RAW from the command line:
 $ git clone https://github.com/densitydesign/raw.git
 ```
 
-browse to RAW root folder:
+Browse to RAW root folder:
 
 ``` sh
 $ cd raw
 ```
 
-install client-side dependencies:
+Install client-side dependencies:
 
 ``` sh
 $ bower install
+$ npm install
 ```
 
-add analytics script:
+Add analytics script (Optional):
 
 ``` sh
 $ cp js/analytics.sample.js js/analytics.js
 ```
 
-open the file ```js/analytics.js``` and add your analytics code (if any), otherwise leave the file as is.
+Open the file `js/analytics.js` and add your analytics code (if any), otherwise leave the file as is.
 
-You can now run RAW from your local web server. For example, you can run Python's built-in server:
-
-``` sh
-$ python -m SimpleHTTPServer 4000
-```
-
-or for Python 3+
+You can now run RAW:
 
 ``` sh
-$ python -m http.server 4000
+npm start
 ```
 
-Once this is running, go to [http://localhost:4000/](http://localhost:4000/).
+Once this is running, go to [http://localhost:1337/](http://localhost:1337/). The correct URL is always shown on the command line.
 
 Troubles with the installation? Maybe a look at the [issues](https://github.com/densitydesign/raw/issues) page can solve your problem, otherwise join the [Google group](https://groups.google.com/forum/#!forum/densitydesign-raw).
 
